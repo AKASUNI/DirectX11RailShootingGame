@@ -3,8 +3,8 @@
 #include "Application.h"
 #include "Game.h"
 
-const auto ClassName = TEXT("2025 framework ひな型");     //ウィンドウクラス名
-const auto WindowName = TEXT("2025 framework ひな型");    //ウィンドウ名
+const auto ClassName = TEXT("DX113D");     //ウィンドウクラス名
+const auto WindowName = TEXT("DX113DFramework");    //ウィンドウ名
 
 HINSTANCE  Application::m_hInst;   // インスタンスハンドル
 HWND       Application::m_hWnd;    // ウィンドウハンドル
@@ -136,8 +136,6 @@ bool Application::InitApp()
 //-----------------------------------------------------------------------------
 void Application::UninitApp()
 {
-
-
     // ウィンドウの登録を解除
     if (m_hInst != nullptr)
     {
@@ -154,12 +152,6 @@ void Application::UninitApp()
 void Application::MainLoop()
 {
     MSG msg = {};
-
-    // ゲームオブジェクト
-    //Game game;
-
-    // ゲーム初期化処理
-    //game.Init();
     
     Game::Init();
 
@@ -249,10 +241,6 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         {
             isFullscreen = !isFullscreen;
             if (isFullscreen) {
-                //フルスクリーンに切り替え
-                //g_pSwapChain->SetFullscreenState(TRUE, NULL);
-                //ShowWindow(hWnd, SW_MAXIMIZE);
-
                 // 疑似フルスクリーンモードに変更
                 SetWindowLongPtr(hWnd, GWL_STYLE, WS_POPUP | WS_MINIMIZEBOX); // ウィンドウ枠を削除
                 // ディスプレイ解像度を取得
@@ -261,10 +249,6 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 SetWindowPos(hWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
             }
             else {
-                //ウィンドウモードに戻す
-                //g_pSwapChain->SetFullscreenState(FALSE, NULL);
-                //ShowWindow(hWnd, SW_RESTORE);
-
                 // 通常ウィンドウに戻す
                 SetWindowLongPtr(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW); // ウィンドウ枠を戻す
                 SetWindowPos(hWnd, HWND_TOP, 100, 100, m_Width, m_Height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);

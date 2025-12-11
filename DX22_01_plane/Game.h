@@ -4,8 +4,8 @@
 
 #include "Renderer.h"
 #include "TitleScene.h"
-#include "Stage1Scene.h"
-#include "ResultScene.h"
+//#include "Stage1Scene.h"
+//#include "ResultScene.h"
 
 
 enum SceneName {
@@ -23,14 +23,7 @@ private:
 
 	// カメラ
 	Camera  m_Camera;
-
-	// テストオブジェクト
-	//TestPlane m_Plane;
-	//TestCube m_Cube;
-	//TestModel m_Model;
-	//GolfBall m_Ball;
 	std::vector<std::unique_ptr<Object>> m_Objects;
-	//Ground  m_ground;
 	Input input;
 
 public:
@@ -66,5 +59,4 @@ public:
 		}
 		return res;
 	}
-
 };
