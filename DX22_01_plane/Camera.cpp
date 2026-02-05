@@ -1,7 +1,6 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Application.h"
-#include "input.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -21,14 +20,7 @@ void Camera::Init()
 //=======================================
 void Camera::Update()
 {
-	if (Input::GetKeyPress(VK_LEFT))
-	{
-		m_CameraDirection += 0.02f;
-	}
-	if (Input::GetKeyPress(VK_RIGHT))
-	{
-		m_CameraDirection -= 0.02f;
-	}
+
 
 
 	Vector3 pos = m_Target;

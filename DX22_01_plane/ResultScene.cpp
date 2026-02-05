@@ -97,11 +97,7 @@ void ResultScene::SetScore(int c)
 // 更新
 void ResultScene::Update()
 {
-	// エンターキーを押してタイトルへ
-	if (Input::GetKeyTrigger(VK_RETURN))
-	{
-		Game::GetInstance()->ChangeScene(TITLE);
-	}
+
 }
 
 // 終了処理

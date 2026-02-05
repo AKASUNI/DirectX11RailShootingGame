@@ -1,11 +1,7 @@
 #include "Stage1Scene.h"
 #include "Game.h"
 #include "Input.h"
-#include "GolfBall.h"
-#include "Ground.h"
 
-#include "Arrow.h"
-#include "Pole.h"
 #include "Texture2D.h"
 using namespace DirectX::SimpleMath;
 
@@ -32,10 +28,6 @@ void Stage1Scene::Init()
 
 
 	// オブジェクトを作成
-	m_MySceneObjects.emplace_back(Game::GetInstance()->AddObject<GolfBall>());
-	m_MySceneObjects.emplace_back(Game::GetInstance()->AddObject<Ground>());
-	m_MySceneObjects.emplace_back(Game::GetInstance()->AddObject<Arrow>());
-	m_MySceneObjects.emplace_back(Game::GetInstance()->AddObject<Pole>());
 
 
 	Texture2D* pt1 = Game::GetInstance()->AddObject<Texture2D>();
@@ -79,12 +71,6 @@ void Stage1Scene::Init()
 	pt6->SetUV(1, 1, 10, 1);
 	m_MySceneObjects.emplace_back(pt6);
 
-	GolfBall* ball = dynamic_cast<GolfBall*>(m_MySceneObjects[0]);
-	Arrow* arrow = dynamic_cast<Arrow*>(m_MySceneObjects[2]);
-	Pole* pole = dynamic_cast<Pole*>(m_MySceneObjects[3]);
-	ball->SetState(0);
-	arrow->SetState(0);
-	pole->SetPosition(10, 0, 10);
 
 }
 
@@ -92,64 +78,6 @@ void Stage1Scene::Init()
 void Stage1Scene::Update()
 {
 
-	GolfBall* ball = dynamic_cast<GolfBall*>(m_MySceneObjects[0]);
-	Arrow* arrow = dynamic_cast<Arrow*>(m_MySceneObjects[2]);
-
-	switch (m_State)
-	{
-	case 0:
-		if (ball->GetState() == 1)
-		{
-			m_State = 1;
-			arrow->SetState(m_State);
-
-			//打数UI更新
-			Texture2D* count[2] = {};
-			count[0] = dynamic_cast<Texture2D*>(m_MySceneObjects[8]);
-			count[1] = dynamic_cast<Texture2D*>(m_MySceneObjects[9]);
-			m_StrokeCount++;
-
-			for (int i = 0; i < 2; i++)
-			{
-				int cnt = m_StrokeCount % (int)pow(10, i + 1) / (int)pow(10, i);
-				count[i]->SetUV((float)(cnt + 1), 1, 10, 1);
-			}
-		}
-		else if (ball->GetState() == 2)
-		{
-			Game::GetInstance()->ChangeScene(RESULT);
-		}
-		break;
-
-	case 1:
-		if (Input::GetKeyTrigger(VK_SPACE))
-		{
-			m_State = 2;
-			arrow->SetState(m_State);
-		}
-		break;
-
-	case 2:
-		if (Input::GetKeyTrigger(VK_SPACE))
-		{
-			m_State = 0;
-			ball->SetState(m_State);
-			arrow->SetState(m_State);
-
-			Vector3 v = arrow->GetVector();
-			ball->Shot(v);
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	// エンターキーを押してリザルトへ
-	if (Input::GetKeyTrigger(VK_RETURN))
-	{
-		Game::GetInstance()->ChangeScene(RESULT);
-	}
 }
 
 int Stage1Scene::GetScore() const

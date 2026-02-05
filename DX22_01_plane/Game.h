@@ -4,8 +4,7 @@
 
 #include "Renderer.h"
 #include "TitleScene.h"
-//#include "Stage1Scene.h"
-//#include "ResultScene.h"
+
 
 
 enum SceneName {
@@ -24,7 +23,6 @@ private:
 	// カメラ
 	Camera  m_Camera;
 	std::vector<std::unique_ptr<Object>> m_Objects;
-	Input input;
 
 public:
 	Game(); // コンストラクタ

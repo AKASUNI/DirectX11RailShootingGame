@@ -22,7 +22,6 @@ void Game::Init()
 {
 	m_Instance = new Game;
 
-	Input::Create();
 
 	// 描画終了処理
 	Renderer::Init();
@@ -36,7 +35,6 @@ void Game::Init()
 // 更新
 void Game::Update()
 {
-	Input::Update();
 
 	m_Instance->m_Scene->Update();
 
@@ -78,7 +76,6 @@ void Game::Uninit()
 	// 描画終了処理
 	Renderer::Uninit();
 
-	Input::Release();
 
 	delete m_Instance;
 }
