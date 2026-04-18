@@ -135,76 +135,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="AssimpPerse.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="ResultScene.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="sound.cpp" />
-    <ClCompile Include="Stage1Scene.cpp" />
-    <ClCompile Include="StaticMesh.cpp" />
-    <ClCompile Include="stb_image.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Texture2D.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
-    <ClCompile Include="utility.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="AssimpPerse.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="IndexBuffer.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ResultScene.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="sound.h" />
-    <ClInclude Include="Stage1Scene.h" />
-    <ClInclude Include="StaticMesh.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="TestCube.h" />
-    <ClInclude Include="TestModel.h" />
-    <ClInclude Include="TestPlane.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Texture2D.h" />
-    <ClInclude Include="TitleScene.h" />
-    <ClInclude Include="utility.h" />
-    <ClInclude Include="VertexBuffer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="shader\common.hlsl">
+    <FxCompile Include="Shader\common.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">main</EntryPointName>
     </FxCompile>
-    <FxCompile Include="shader\litTexturePS.hlsl">
+    <FxCompile Include="Shader\litTexturePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="shader\litTextureVS.hlsl">
+    <FxCompile Include="Shader\litTextureVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="shader\unlitTexturePS.hlsl">
+    <FxCompile Include="Shader\unlitTexturePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="shader\unlitTextureVS.hlsl">
+    <FxCompile Include="Shader\unlitTextureVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
