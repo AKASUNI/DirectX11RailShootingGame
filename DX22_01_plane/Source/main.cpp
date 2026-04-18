@@ -13,6 +13,22 @@ const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const wchar_t* WINDOW_TITLE = L"DX11 Triangle";
 
+// 頂点構造体
+struct Vertex
+{
+    XMFLOAT3 pos;   // 位置 (x, y, z)
+    XMFLOAT4 color; // 色  (r, g, b, a)
+};
+
+// カメラ構造体
+struct CameraBuffer
+{
+    XMMATRIX world;
+    XMMATRIX view;
+    XMMATRIX projection;
+};
+
+
 //グローバル変数
 ID3D11Device* g_pDevice = nullptr;
 ID3D11DeviceContext* g_pContext = nullptr;
@@ -22,15 +38,19 @@ ID3D11VertexShader* g_pVertexShader = nullptr;
 ID3D11PixelShader* g_pPixelShader = nullptr;
 ID3D11InputLayout* g_pInputLayout = nullptr;
 ID3D11Buffer* g_pVertexBuffer = nullptr;
+ID3D11Buffer* g_pCameraBuffer = nullptr;
 
-// 頂点構造体
-struct Vertex
-{
-    XMFLOAT3 pos;   // 位置 (x, y, z)
-    XMFLOAT4 color; // 色  (r, g, b, a)
-};
 
-//シェーダーのディレクトリ
+// カメラ設定
+const XMVECTOR CAM_POS = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);   // カメラ位置
+const XMVECTOR CAM_TARGET = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f); // 注視点
+const XMVECTOR CAM_UP = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);     // 上方向
+XMFLOAT3 g_pos = { 0.0f, 0.0f, 0.0f };  // 位置
+XMFLOAT3 g_rot = { 0.0f, 0.0f, 0.0f };  // 回転（ラジアン）
+XMFLOAT3 g_scale = { 1.0f, 1.0f, 1.0f };  // スケール
+
+
+// シェーダーのディレクトリパス
 const wchar_t* SHADER_PATH_V = L"Shader\\VertexShader.hlsl";
 const wchar_t* SHADER_PATH_P = L"Shader\\PixelShader.hlsl";
 
@@ -185,6 +205,18 @@ HRESULT InitDX(HWND hWnd)
     g_pDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader);
     g_pDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader);
 
+
+    // カメラ定数バッファ生成
+    D3D11_BUFFER_DESC cbd = {};
+    cbd.Usage = D3D11_USAGE_DYNAMIC;
+    cbd.ByteWidth = sizeof(CameraBuffer);
+    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    g_pDevice->CreateBuffer(&cbd, nullptr, &g_pCameraBuffer);
+
+
+
     // 入力レイアウト定義
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
@@ -226,8 +258,44 @@ void InitGeometry()
 void Render()
 {
     // 画面クリア（濃いグレー）
-    float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+    float clearColor[4] = { 0.1f, 0.1f, 0.3f, 1.0f };
     g_pContext->ClearRenderTargetView(g_pRenderTarget, clearColor);
+
+    // 角度更新
+    g_rot.z += 0.05f;
+
+    // カメラ定数バッファ更新
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    g_pContext->Map(g_pCameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    CameraBuffer* cb = (CameraBuffer*)mapped.pData;
+
+    // ワールド行列更新
+    XMMATRIX mTrans = XMMatrixTranslation(g_pos.x, g_pos.y, g_pos.z);
+    XMMATRIX mRotX = XMMatrixRotationX(g_rot.x);
+    XMMATRIX mRotY = XMMatrixRotationY(g_rot.y);
+    XMMATRIX mRotZ = XMMatrixRotationZ(g_rot.z);
+    XMMATRIX mScale = XMMatrixScaling(g_scale.x, g_scale.y, g_scale.z);
+
+    // スケール、回転、移動の順に合成
+    cb->world = XMMatrixTranspose(mScale * mRotX * mRotY * mRotZ * mTrans);
+
+    // ビュー行列
+    cb->view = XMMatrixTranspose(XMMatrixLookAtLH(CAM_POS, CAM_TARGET, CAM_UP));
+
+    //プロジェクション行列
+    cb->projection = XMMatrixTranspose(
+        XMMatrixPerspectiveFovLH(
+            XMConvertToRadians(45.f),                    // 画角
+            (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,   // アスペクト比
+            0.1f, 100.f                                   // ニア・ファー
+        )
+    );
+
+    g_pContext->Unmap(g_pCameraBuffer, 0);
+
+    // カメラの定数バッファをスロット0にセット
+    g_pContext->VSSetConstantBuffers(0, 1, &g_pCameraBuffer);
+
 
     // シェーダーセット
     g_pContext->VSSetShader(g_pVertexShader, nullptr, 0);
@@ -261,4 +329,5 @@ void Cleanup()
     if (g_pSwapChain)    g_pSwapChain->Release();
     if (g_pContext)      g_pContext->Release();
     if (g_pDevice)       g_pDevice->Release();
+    if (g_pCameraBuffer)  g_pCameraBuffer->Release();
 }

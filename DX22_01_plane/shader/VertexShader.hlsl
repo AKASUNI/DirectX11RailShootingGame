@@ -1,3 +1,11 @@
+// カメラの定数バッファ追加
+cbuffer CameraBuffer : register(b0)
+{
+    matrix world;
+    matrix view;
+    matrix projection;
+};
+
 // 頂点シェーダーへの入力
 struct VSInput
 {
@@ -16,8 +24,13 @@ struct PSInput
 PSInput VS(VSInput input)
 {
     PSInput output;
-    // クリップ空間をそのまま使う（座標変換なし）
-    output.pos = float4(input.pos, 1.0f);
+    float4 pos = float4(input.pos, 1.f);
+    
+    // ワールド、ビュー、プロジェクションの順に変換
+    pos = mul(pos, world);
+    pos = mul(pos, view);
+    pos = mul(pos, projection);
+    output.pos = pos;
     output.color = input.color;
     return output;
 }
