@@ -2,11 +2,18 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
+#include <chrono>
+
+#include "CloudPlane.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
+
+std::chrono::steady_clock::time_point g_lastTime;
+float g_deltaTime = 0.0f;
+
 
 //ウィンドウサイズ
 const int WINDOW_WIDTH = 800;
@@ -41,13 +48,15 @@ ID3D11Buffer* g_pVertexBuffer = nullptr;
 ID3D11Buffer* g_pCameraBuffer = nullptr;
 
 
-// カメラ設定
-const XMVECTOR CAM_POS = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);   // カメラ位置
-const XMVECTOR CAM_TARGET = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f); // 注視点
-const XMVECTOR CAM_UP = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);     // 上方向
-XMFLOAT3 g_pos = { 0.0f, 0.0f, 0.0f };  // 位置
-XMFLOAT3 g_rot = { 0.0f, 0.0f, 0.0f };  // 回転（ラジアン）
-XMFLOAT3 g_scale = { 1.0f, 1.0f, 1.0f };  // スケール
+// カメラ設定を const から変数に変更
+XMFLOAT3 g_camPos = { 0.0f, 0.0f, -3.0f };
+XMFLOAT2 g_camAngle = { 0.0f, 0.0f };  // x=上下(pitch), y=左右(yaw)
+float    g_camSpeed = 5.0f;
+float    g_rotSpeed = 1.5f;
+
+
+// 雲
+CloudPlane cloude;
 
 
 // シェーダーのディレクトリパス
@@ -59,6 +68,7 @@ const wchar_t* SHADER_PATH_P = L"Shader\\PixelShader.hlsl";
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 HRESULT InitDX(HWND hWnd);
 void    InitGeometry();
+void    Update();
 void    Render();
 void    Cleanup();
 
@@ -97,6 +107,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     // 三角形の頂点データ初期化
     InitGeometry();
 
+    // 雲の初期化
+    cloude.Init(g_pDevice);
+
+    // 時間の初期化
+    g_lastTime = std::chrono::steady_clock::now();
+
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
@@ -111,6 +127,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
         }
         else
         {
+            auto now = std::chrono::steady_clock::now();
+            g_deltaTime = std::chrono::duration<float>(now - g_lastTime).count();
+            g_lastTime = now;
+
+            Update();
             Render();
         }
     }
@@ -254,66 +275,78 @@ void InitGeometry()
     g_pDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffer);
 }
 
-// 描画
+void Update()
+{
+    // 回転（上下左右キー）
+    if (GetAsyncKeyState(VK_UP) & 0x8000) g_camAngle.x -= g_rotSpeed * g_deltaTime;
+    if (GetAsyncKeyState(VK_DOWN) & 0x8000) g_camAngle.x += g_rotSpeed * g_deltaTime;
+    if (GetAsyncKeyState(VK_LEFT) & 0x8000) g_camAngle.y -= g_rotSpeed * g_deltaTime;
+    if (GetAsyncKeyState(VK_RIGHT) & 0x8000) g_camAngle.y += g_rotSpeed * g_deltaTime;
+
+    // 仰角を制限（真上・真下を超えないように）
+    g_camAngle.x = max(-XM_PIDIV2 + 0.01f, min(XM_PIDIV2 - 0.01f, g_camAngle.x));
+
+    // カメラの向きベクトルを計算
+    XMMATRIX rot = XMMatrixRotationRollPitchYaw(g_camAngle.x, g_camAngle.y, 0.0f);
+    XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), rot);
+    XMVECTOR right = XMVector3TransformNormal(XMVectorSet(1, 0, 0, 0), rot);
+
+    // 移動（WASD）
+    XMVECTOR pos = XMLoadFloat3(&g_camPos);
+    if (GetAsyncKeyState('W') & 0x8000) pos = XMVectorAdd(pos, XMVectorScale(forward, g_camSpeed * g_deltaTime));
+    if (GetAsyncKeyState('S') & 0x8000) pos = XMVectorAdd(pos, XMVectorScale(forward, -g_camSpeed * g_deltaTime));
+    if (GetAsyncKeyState('A') & 0x8000) pos = XMVectorAdd(pos, XMVectorScale(right, -g_camSpeed * g_deltaTime));
+    if (GetAsyncKeyState('D') & 0x8000) pos = XMVectorAdd(pos, XMVectorScale(right, g_camSpeed * g_deltaTime));
+    XMStoreFloat3(&g_camPos, pos);
+
+    // CloudPlane に渡す
+    cloude.Update(g_deltaTime, g_camPos);
+}
+
+
 void Render()
 {
-    // 画面クリア（濃いグレー）
-    float clearColor[4] = { 0.1f, 0.1f, 0.3f, 1.0f };
+    float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     g_pContext->ClearRenderTargetView(g_pRenderTarget, clearColor);
 
-    // 角度更新
-    g_rot.z += 0.05f;
+    // カメラの向きからターゲット座標を計算
+    XMMATRIX rot = XMMatrixRotationRollPitchYaw(g_camAngle.x, g_camAngle.y, 0.0f);
+    XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), rot);
+    XMVECTOR camPos = XMLoadFloat3(&g_camPos);
+    XMVECTOR target = XMVectorAdd(camPos, forward);
+
+    XMMATRIX view = XMMatrixLookAtLH(camPos, target, XMVectorSet(0, 1, 0, 0));
+    XMMATRIX proj = XMMatrixPerspectiveFovLH(
+        XMConvertToRadians(45.f),
+        (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
+        0.1f, 10000.f
+    );
 
     // カメラ定数バッファ更新
     D3D11_MAPPED_SUBRESOURCE mapped;
     g_pContext->Map(g_pCameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     CameraBuffer* cb = (CameraBuffer*)mapped.pData;
 
-    // ワールド行列更新
-    XMMATRIX mTrans = XMMatrixTranslation(g_pos.x, g_pos.y, g_pos.z);
-    XMMATRIX mRotX = XMMatrixRotationX(g_rot.x);
-    XMMATRIX mRotY = XMMatrixRotationY(g_rot.y);
-    XMMATRIX mRotZ = XMMatrixRotationZ(g_rot.z);
-    XMMATRIX mScale = XMMatrixScaling(g_scale.x, g_scale.y, g_scale.z);
+    
 
-    // スケール、回転、移動の順に合成
-    cb->world = XMMatrixTranspose(mScale * mRotX * mRotY * mRotZ * mTrans);
-
-    // ビュー行列
-    cb->view = XMMatrixTranspose(XMMatrixLookAtLH(CAM_POS, CAM_TARGET, CAM_UP));
-
-    //プロジェクション行列
-    cb->projection = XMMatrixTranspose(
-        XMMatrixPerspectiveFovLH(
-            XMConvertToRadians(45.f),                    // 画角
-            (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,   // アスペクト比
-            0.1f, 100.f                                   // ニア・ファー
-        )
-    );
-
+    cb->world = XMMatrixTranspose(XMMatrixIdentity());
+    cb->view = XMMatrixTranspose(view);
+    cb->projection = XMMatrixTranspose(proj);
     g_pContext->Unmap(g_pCameraBuffer, 0);
 
-    // カメラの定数バッファをスロット0にセット
+    // 以降は既存のまま
     g_pContext->VSSetConstantBuffers(0, 1, &g_pCameraBuffer);
-
-
-    // シェーダーセット
     g_pContext->VSSetShader(g_pVertexShader, nullptr, 0);
     g_pContext->PSSetShader(g_pPixelShader, nullptr, 0);
     g_pContext->IASetInputLayout(g_pInputLayout);
 
-    // 頂点バッファセット
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
+    UINT stride = sizeof(Vertex), offset = 0;
     g_pContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
-
-    // プリミティブトポロジー（三角形リスト）
     g_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    // 描画（頂点3つ）
     g_pContext->Draw(3, 0);
 
-    // 画面更新
+    cloude.Draw(g_pContext, view, proj);
+
     g_pSwapChain->Present(1, 0);
 }
 
