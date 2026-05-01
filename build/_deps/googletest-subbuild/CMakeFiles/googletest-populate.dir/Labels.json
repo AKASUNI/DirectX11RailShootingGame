@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/996ae30e0c61d0a05f6503e5dbf6b49c/googletest-populate.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/ac9b35a4672a79ff936c7b02e1e1e49e/googletest-populate-complete.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-build.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-configure.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-download.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-install.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-patch.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-test.rule"
+		},
+		{
+			"file" : "C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-subbuild/CMakeFiles/e6e10d07ea4df14d3b63815fc5a134c1/googletest-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"googletest-populate"
+		],
+		"name" : "googletest-populate"
+	}
+}

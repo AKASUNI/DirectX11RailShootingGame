@@ -3,8 +3,12 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 
+#include "MathUtils.h"
+
+
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+
 
 using namespace DirectX;
 
@@ -257,38 +261,22 @@ void InitGeometry()
 // 描画
 void Render()
 {
-    // 画面クリア（濃いグレー）
     float clearColor[4] = { 0.1f, 0.1f, 0.3f, 1.0f };
     g_pContext->ClearRenderTargetView(g_pRenderTarget, clearColor);
 
-    // 角度更新
     g_rot.z += 0.05f;
 
-    // カメラ定数バッファ更新
     D3D11_MAPPED_SUBRESOURCE mapped;
     g_pContext->Map(g_pCameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     CameraBuffer* cb = (CameraBuffer*)mapped.pData;
 
-    // ワールド行列更新
-    XMMATRIX mTrans = XMMatrixTranslation(g_pos.x, g_pos.y, g_pos.z);
-    XMMATRIX mRotX = XMMatrixRotationX(g_rot.x);
-    XMMATRIX mRotY = XMMatrixRotationY(g_rot.y);
-    XMMATRIX mRotZ = XMMatrixRotationZ(g_rot.z);
-    XMMATRIX mScale = XMMatrixScaling(g_scale.x, g_scale.y, g_scale.z);
-
-    // スケール、回転、移動の順に合成
-    cb->world = XMMatrixTranspose(mScale * mRotX * mRotY * mRotZ * mTrans);
-
-    // ビュー行列
-    cb->view = XMMatrixTranspose(XMMatrixLookAtLH(CAM_POS, CAM_TARGET, CAM_UP));
-
-    //プロジェクション行列
-    cb->projection = XMMatrixTranspose(
-        XMMatrixPerspectiveFovLH(
-            XMConvertToRadians(45.f),                    // 画角
-            (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,   // アスペクト比
-            0.1f, 100.f                                   // ニア・ファー
-        )
+    // ★ 分離した関数を使う
+    cb->world = BuildWorldMatrix(g_pos, g_rot, g_scale);
+    cb->view = BuildViewMatrix(CAM_POS, CAM_TARGET, CAM_UP);
+    cb->projection = BuildProjectionMatrix(
+        45.f,
+        (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
+        0.1f, 100.f
     );
 
     g_pContext->Unmap(g_pCameraBuffer, 0);

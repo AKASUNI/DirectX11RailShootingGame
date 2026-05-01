@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\KOUAS\Desktop\HAL\3\DirectX11\EmploymentWork\RailShootingGame\build\CMakeFiles\37dc8c1d53e31c49d138f774fdc30a9c\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{6ED62216-02CE-31C5-8853-19F978BFD30E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

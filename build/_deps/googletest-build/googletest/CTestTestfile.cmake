@@ -1,0 +1,6 @@
+# CMake generated Testfile for 
+# Source directory: C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-src/googletest
+# Build directory: C:/Users/KOUAS/Desktop/HAL/3/DirectX11/EmploymentWork/RailShootingGame/build/_deps/googletest-build/googletest
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
